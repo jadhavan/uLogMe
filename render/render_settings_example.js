@@ -11,8 +11,8 @@
 // these get applied in order they are specified, from top to bottom
 var title_mappings = [
     // Internet
-    {pattern: /Google Chrome/,        mapto: "Firefox"}, // lol
-    {pattern: /Firefox/,              mapto: "Firefox"},
+    {pattern: /Google Chrome/,        mapto: "Chrome"},
+    {pattern: /Firefox/,              mapto: "Chrome"}, // lol
     // Social browsing
     {pattern: /Outlook/,              mapto: "Mails"},
     {pattern: /GMail/,                mapto: "Mails"},
@@ -21,23 +21,20 @@ var title_mappings = [
     {pattern: /Facebook/,             mapto: "Facebook"},
     {pattern: /Messenger/,            mapto: "Facebook"},
     {pattern: /Slack/,                mapto: "Slack"},
+    {pattern: /WhatsApp/,             mapto: "WhatsApp"},
     // Self-quantified browsing
-    {pattern: /Stats pour/,           mapto: "Self-Quantified"},
-    {pattern: /Munin/,                mapto: "Self-Quantified"},
-    {pattern: /uLogMe - /,            mapto: "Self-Quantified"},
-    {pattern: /WakaTime/,             mapto: "Self-Quantified"},
-    {pattern: /Google Analytics/,     mapto: "Self-Quantified"},
+    {pattern: /ulogme/,               mapto: "Self-Quantified"},
     // Agenda
     {pattern: /TODO list/,            mapto: "Agenda"},
-    {pattern: /Google Agenda/,        mapto: "Agenda"},
+    {pattern: /Google Calendar/,      mapto: "Agenda"},
     // Hacking browsing
     {pattern: /GitHub/,               mapto: "GitHub"},
-    {pattern: / · Naereen/,           mapto: "GitHub"},
+    {pattern: /jadhavan/,             mapto: "GitHub"},
     {pattern: /Bitbucket/,            mapto: "Bitbucket"},
     // Music
     {pattern: /YouTube/,              mapto: "YouTube"},
     {pattern: /VLC/,                  mapto: "VLC"},
-    {pattern: / par /,                mapto: "GMusicBrowser"},
+    {pattern: /Google Play Music/,    mapto: "GMusicBrowser"},
     // Programming
     {pattern: /MATLAB/,               mapto: "Matlab"},
     {pattern: /Figure/,               mapto: "Figure"},
@@ -75,6 +72,8 @@ var title_mappings = [
     {pattern: /\.tex.*Atom/,          mapto: "Atom LaTeX"},
     {pattern: /\.md.*Atom/,           mapto: "Atom Markdown"},
     {pattern: /\.rst.*Atom/,          mapto: "Atom rST"},
+    // Qt Creator patterns
+    {pattern: /Qt Creator/,          mapto: "Qt Creator"},
     // PyCharm patterns
     {pattern: /PyCharm/,              mapto: "PyCharm"},
     {pattern: /\.py.*PyCharm/,        mapto: "PyCharm Python"},
@@ -112,13 +111,13 @@ function mapwin(w) {
 var display_groups = [];
 
 display_groups.push(["GitHub", "Bitbucket"]); // Hacking browsing
-display_groups.push(["Mails", "Skype", "Facebook", "Slack"]); // Social browsing
+display_groups.push(["Mails", "Skype", "Facebook", "Slack","WhatsApp"]); // Social browsing
 
 display_groups.push(["YouTube", "VLC", "GMusicBrowser"]); // Music
 display_groups.push(["Agenda", "Self-Quantified"]); // Self-quantified browsing and Agenda
 
 display_groups.push(["Firefox", "Misc"]); // Internet
-display_groups.push(["ST3", "Atom", "VS-Code", "PyCharm"]); // Generic coding
+display_groups.push(["ST3", "Atom", "VS-Code", "PyCharm","Qt Creator"]); // Generic coding
 display_groups.push(["Terminal"]); // Terminal
 display_groups.push(["Matlab", "Figure", "ST3 Python", "VS-Code Python", "Atom Python", "Notebook", "PyCharm Python"]); // Coding Python related
 display_groups.push(["ST3 Bash", "VS-Code Bash", "Atom Bash"]); // Coding bash related
@@ -134,8 +133,8 @@ display_groups.push(["Computer locked", "Computer idle", "Computer suspended"]);
 // All related activities will be shown in outer piechart ring.
 var activity_groups = [];
 activity_groups.push({name:"Fun", titles: ["YouTube", "VLC", "GMusicBrowser"]});
-activity_groups.push({name:"Coding", titles: ["GitHub", "Bitbucket", "Matlab", "Figure", "Notebook", "ST3 Python", "ST3 Bash", "ST3 JS", "ST3 HTML", "ST3 CSS", "ST3 Markdown", "ST3 rST", "ST3 LaTeX", "ST3", "VS-Code Python","VS-Code Bash", "VS-Code JS", "VS-Code HTML", "VS-Code CSS", "VS-Code Markdown", "VS-Code rST", "VS-Code LaTeX", "VS-Code", "Atom Python","Atom Bash", "Atom JS", "Atom HTML", "Atom CSS", "Atom Markdown", "Atom rST", "Atom LaTeX", "Atom", "Terminal", "PyCharm", "PyCharm Python", "PyCharm Markdown", "PyCharm rST"]});
-activity_groups.push({name:"Social", titles: ["Mails", "Skype", "Facebook", "Slack", , "Misc"]});
+activity_groups.push({name:"Coding", titles: ["GitHub", "Bitbucket", "Matlab", "Figure", "Notebook", "ST3 Python", "ST3 Bash", "ST3 JS", "ST3 HTML", "ST3 CSS", "ST3 Markdown", "ST3 rST", "ST3 LaTeX", "ST3", "VS-Code Python","VS-Code Bash", "VS-Code JS", "VS-Code HTML", "VS-Code CSS", "VS-Code Markdown", "VS-Code rST", "VS-Code LaTeX", "VS-Code", "Atom Python","Atom Bash", "Atom JS", "Atom HTML", "Atom CSS", "Atom Markdown", "Atom rST", "Atom LaTeX", "Atom", "Terminal", "PyCharm", "PyCharm Python", "PyCharm Markdown", "PyCharm rST","Qt Creator"]});
+activity_groups.push({name:"Social", titles: ["Mails", "Skype", "Facebook", "Slack", , "Misc", "WhatsApp"]});
 activity_groups.push({name:"Browsing", titles: ["Self-Quantified", "Firefox", "Agenda", "PDF"]});
 activity_groups.push({name:"Away", titles: ["Computer locked", "Computer idle", "Computer suspended"]});
 
@@ -146,7 +145,7 @@ activity_groups.push({name:"Away", titles: ["Computer locked", "Computer idle", 
 // classify as hacking, and they break "streaks" (events of focused hacking)
 // the implementation is currently quite hacky, experimental and contains
 // many magic numbers.
-var hacking_titles = ["Notebook", "Terminal", "Matlab", "ST3 Python", "ST3 JS", "ST3 HTML", "ST3 HTML", "ST3 LaTeX", "ST3 Markdown", "ST3 rST", "ST3", "VS-Code Python", "VS-Code JS", "VS-Code HTML", "VS-Code HTML", "VS-Code LaTeX", "VS-Code Markdown", "VS-Code rST", "VS-Code", "Atom Python", "Atom JS", "Atom HTML", "Atom HTML", "Atom LaTeX", "Atom Markdown", "Atom rST", "Atom", "PyCharm", "PyCharm Python", "PyCharm Markdown", "PyCharm rST"];
+var hacking_titles = ["Notebook", "Terminal", "Matlab", "ST3 Python", "ST3 JS", "ST3 HTML", "ST3 HTML", "ST3 LaTeX", "ST3 Markdown", "ST3 rST", "ST3", "VS-Code Python", "VS-Code JS", "VS-Code HTML", "VS-Code HTML", "VS-Code LaTeX", "VS-Code Markdown", "VS-Code rST", "VS-Code", "Atom Python", "Atom JS", "Atom HTML", "Atom HTML", "Atom LaTeX", "Atom Markdown", "Atom rST", "Atom", "PyCharm", "PyCharm Python", "PyCharm Markdown", "PyCharm rST", "Qt Creator"];
 var hacking_title = "Continuous typing";
 var draw_hacking = true; // by default turning this on
 
@@ -159,4 +158,4 @@ var draw_notes = true;
 var draw_coffee = true;
 
 // Reload interval in minutes. Set to 0 to turn off.
-var auto_reload_interval = 0;
+var auto_reload_interval = 20;
