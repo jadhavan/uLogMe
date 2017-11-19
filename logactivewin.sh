@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Use https://bitbucket.org/lbesson/bin/src/master/.color.sh to add colors in Bash scripts
+[ -f color.sh ] && . color.sh
+
 LANG=en_US.utf8
 
 # logs the active window titles over time. Logs are written 
@@ -15,6 +18,16 @@ maxtime="600" # if last write happened more than this many seconds ago, write ev
 mkdir -p logs
 last_write="0"
 lasttitle=""
+
+
+# First message to inform that the script was started correctly
+echo -e "${green}$0 has been started successfully.${reset}"
+echo -e "  - It will ${red}constantly${reset} record the title of the active window of your graphical environment."
+echo -e "  - It will work in time window of ${red}$waittime${reset} seconds."
+echo
+
+
+# Start the main loop
 while true
 do
 	islocked=true
